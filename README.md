@@ -1,5 +1,7 @@
 # TP-Ansible
 
+Je déploie l'architecture et la machine via terraform. J'ouvre également le port 3000 via terraform et non pas par ansible.
+
 J'ai testé plusieurs moyens de déployer semaphore :
 
   - J'ai commencé à l'installer via un playbook avec **snapd**, cela a fonctionné mais je n'ai pas réussi à le configurer BoltDB.

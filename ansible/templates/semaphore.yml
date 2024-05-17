@@ -1,0 +1,66 @@
+---
+- name: Deploy Semaphore using Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create Docker Compose directory
+      file:
+        path: /opt/semaphore
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create docker-compose.yml file
+      copy:
+        dest: /opt/semaphore/docker-compose.yml
+        content: |
+          version: '3'
+          services:
+            semaphore:
+              ports:
+                - "3000:3000"
+              image: semaphoreui/semaphore:latest
+              environment:
+                SEMAPHORE_DB_DIALECT: bolt
+                SEMAPHORE_ADMIN: admin
+                SEMAPHORE_ADMIN_PASSWORD: admin
+                SEMAPHORE_ADMIN_NAME: Admin
+                SEMAPHORE_ADMIN_EMAIL: admin@localhost
+
+    - name: Start Semaphore using Docker Compose
+      command: docker-compose up -d
+      args:
+        chdir: /opt/semaphore
+
+    - name: Ensure Semaphore container is running
+      docker_container:
+        name: semaphore
+        image: semaphoreui/semaphore:latest
+        state: started
+        ports:
+          - "3000:3000"
+        env:
+          SEMAPHORE_DB_DIALECT: bolt
+          SEMAPHORE_ADMIN: admin
+          SEMAPHORE_ADMIN_PASSWORD: admin
+          SEMAPHORE_ADMIN_NAME: Admin
+          SEMAPHORE_ADMIN_EMAIL: admin@localhost

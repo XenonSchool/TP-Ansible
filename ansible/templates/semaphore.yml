@@ -3,25 +3,25 @@
   hosts: all
   become: true
   tasks:
-    - name: Install Docker
+    - name: Installation de Docker
       apt:
         name: docker.io
         state: present
         update_cache: yes
 
-    - name: Install Docker Compose
+    - name: Installation de Docker Compose
       apt:
         name: docker-compose
         state: present
         update_cache: yes
 
-    - name: Ensure Docker service is running
+    - name: Verification que docker est actif
       service:
         name: docker
         state: started
         enabled: yes
 
-    - name: Create Docker Compose directory
+    - name: Creation du repertoire pour dockercompose
       file:
         path: /opt/semaphore
         state: directory
@@ -29,7 +29,7 @@
         group: root
         mode: '0755'
 
-    - name: Create docker-compose.yml file
+    - name: Creation du fichier dockercompose
       copy:
         dest: /opt/semaphore/docker-compose.yml
         content: |
@@ -46,12 +46,12 @@
                 SEMAPHORE_ADMIN_NAME: Admin
                 SEMAPHORE_ADMIN_EMAIL: admin@localhost
 
-    - name: Start Semaphore using Docker Compose
+    - name: Demarrage de semaphore via dockercompose
       command: docker-compose up -d
       args:
         chdir: /opt/semaphore
 
-    - name: Ensure Semaphore container is running
+    - name: Verification du contenair docker
       docker_container:
         name: semaphore
         image: semaphoreui/semaphore:latest
